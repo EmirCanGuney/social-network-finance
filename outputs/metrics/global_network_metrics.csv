@@ -1,0 +1,3 @@
+Network,Nodes,Edges,Density,Average degree,Connected components,Largest component size,Largest component diameter,Average clustering
+Full network including isolated nodes,18,19,0.12418300653594772,2.111111111111111,9,6,1,0.3333333333333333
+Active network excluding isolated nodes,13,19,0.24358974358974358,2.923076923076923,4,6,1,0.46153846153846156
