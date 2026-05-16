@@ -1,6 +1,7 @@
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import community as community_louvain
 import os
 
@@ -34,12 +35,15 @@ def load_network():
 def detect_communities(G):
 
     partition = community_louvain.best_partition(
-        G
+        G,
+        weight="weight",
+        random_state=42
     )
 
     modularity = community_louvain.modularity(
         partition,
-        G
+        G,
+        weight="weight"
     )
 
     print("\nCOMMUNITY RESULTS")
@@ -76,18 +80,41 @@ def visualize_communities(G, partition):
 
     plt.figure(figsize=(18, 14))
 
-    pos = nx.spring_layout(
+    base_pos = nx.spring_layout(
         G,
         seed=42,
-        k=1.3
+        k=1.4,
+        weight="weight"
     )
 
-    communities = list(set(partition.values()))
+    community_colors = {
+        0: "#1f5a9d",
+        1: "#008080",
+        2: "#3f7f52",
+        3: "#c43d3d",
+    }
 
-    color_map = plt.cm.Set3
+    community_labels = {
+        0: "Topluluk 0: EUR_TRY, USD_TRY",
+        1: "Topluluk 1: Dollar_Index, Gold, Silver",
+        2: "Topluluk 2: DAX, Dow_Jones, FTSE100, NASDAQ, SP500, VIX",
+        3: "Topluluk 3: Brent_Oil, WTI_Oil",
+    }
+
+    community_anchors = {
+        0: (-2.2, 1.25),
+        1: (-0.9, 0.15),
+        2: (1.05, -0.65),
+        3: (-2.2, -1.15),
+    }
+
+    pos = {}
+    for node, (x, y) in base_pos.items():
+        anchor_x, anchor_y = community_anchors.get(partition[node], (0, 0))
+        pos[node] = (anchor_x + x * 0.65, anchor_y + y * 0.65)
 
     node_colors = [
-        color_map(partition[node] / len(communities))
+        community_colors.get(partition[node], "#777777")
         for node in G.nodes()
     ]
 
@@ -150,12 +177,39 @@ def visualize_communities(G, partition):
         G,
         pos,
         font_size=9,
-        font_weight="bold"
+        font_weight="bold",
+        font_color="black"
+    )
+
+    legend_items = [
+        Line2D(
+            [0],
+            [0],
+            marker="o",
+            color="w",
+            markerfacecolor=community_colors[community_id],
+            markeredgecolor="black",
+            markersize=10,
+            label=community_labels[community_id]
+        )
+        for community_id in sorted(community_colors)
+    ]
+
+    edge_items = [
+        Line2D([0], [0], color="red", lw=2.5, label="Pozitif korelasyon"),
+        Line2D([0], [0], color="blue", lw=2.5, label="Negatif korelasyon"),
+    ]
+
+    plt.legend(
+        handles=legend_items + edge_items,
+        loc="lower left",
+        frameon=True,
+        fontsize=9
     )
 
     plt.title(
-        "Financial Asset Community Network\n"
-        "Node Colors Represent Communities",
+        "Finansal Varlik Topluluk Agi\n"
+        "Renkler Louvain yontemiyle bulunan 4 toplulugu gosterir",
         fontsize=18
     )
 
@@ -169,7 +223,7 @@ def visualize_communities(G, partition):
         bbox_inches="tight"
     )
 
-    plt.show()
+    plt.close()
 
     print("\nCommunity graph oluşturuldu.")
 

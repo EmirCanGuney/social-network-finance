@@ -1,6 +1,8 @@
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
+from matplotlib import colors as mcolors
+from matplotlib.cm import ScalarMappable
 import os
 
 
@@ -87,8 +89,17 @@ def visualize_network(G):
         for node in G.nodes()
     ]
 
+    color_norm = mcolors.Normalize(
+        vmin=min(degree_centrality.values()) if degree_centrality else 0,
+        vmax=max(degree_centrality.values()) if degree_centrality else 1
+    )
+    color_map = mcolors.LinearSegmentedColormap.from_list(
+        "centrality_colors",
+        ["#a8d8ff", "#4ea8de", "#ffd166", "#fff200"]
+    )
+
     node_colors = [
-        degree_centrality[node]
+        color_map(color_norm(degree_centrality[node]))
         for node in G.nodes()
     ]
 
@@ -117,7 +128,6 @@ def visualize_network(G):
         pos,
         node_size=node_sizes,
         node_color=node_colors,
-        cmap=plt.cm.plasma,
         edgecolors="black",
         linewidths=1.5,
         alpha=0.92
@@ -168,7 +178,9 @@ def visualize_network(G):
         )
     )
 
-    cbar = plt.colorbar(nodes)
+    scalar_mappable = ScalarMappable(norm=color_norm, cmap=color_map)
+    scalar_mappable.set_array([])
+    cbar = plt.colorbar(scalar_mappable, ax=plt.gca())
     cbar.set_label(
         "Degree Centrality",
         fontsize=12
@@ -196,7 +208,7 @@ def visualize_network(G):
         bbox_inches="tight"
     )
 
-    plt.show()
+    plt.close()
 
     print("\nGeliştirilmiş network graph oluşturuldu.")
 

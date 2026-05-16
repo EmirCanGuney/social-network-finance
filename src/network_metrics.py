@@ -88,21 +88,49 @@ def calculate_global_metrics(G):
 
     density = nx.density(G)
 
+    average_degree = (
+        2 * G.number_of_edges() / G.number_of_nodes()
+        if G.number_of_nodes() > 0
+        else 0
+    )
+
     avg_clustering = nx.average_clustering(G)
 
-    connected_components = nx.number_connected_components(G)
+    components = list(nx.connected_components(G))
+
+    connected_components = len(components)
+
+    largest_component = (
+        G.subgraph(max(components, key=len)).copy()
+        if components
+        else nx.Graph()
+    )
+
+    largest_component_size = largest_component.number_of_nodes()
+
+    diameter = (
+        nx.diameter(largest_component)
+        if largest_component.number_of_nodes() > 1
+        else 0
+    )
 
     print("\nGLOBAL NETWORK METRICS")
     print("-" * 40)
 
     print(f"Network Density: {density:.4f}")
+    print(f"Average Degree: {average_degree:.4f}")
     print(f"Average Clustering Coefficient: {avg_clustering:.4f}")
     print(f"Connected Components: {connected_components}")
+    print(f"Largest Component Size: {largest_component_size}")
+    print(f"Largest Component Diameter: {diameter}")
 
     return {
         "Density": density,
+        "Average_Degree": average_degree,
         "Average_Clustering": avg_clustering,
-        "Connected_Components": connected_components
+        "Connected_Components": connected_components,
+        "Largest_Component_Size": largest_component_size,
+        "Largest_Component_Diameter": diameter
     }
 
 
@@ -115,6 +143,18 @@ def save_metrics(metrics):
     )
 
     print("\nNode metricleri kaydedildi.")
+
+
+def save_global_metrics(global_metrics):
+
+    os.makedirs("outputs/metrics", exist_ok=True)
+
+    pd.DataFrame([global_metrics]).to_csv(
+        "outputs/metrics/global_network_metrics_from_script.csv",
+        index=False
+    )
+
+    print("\nGlobal network metricleri kaydedildi.")
 
 
 def visualize_top_nodes(metrics):
@@ -163,8 +203,10 @@ if __name__ == "__main__":
         ascending=False
     ))
 
-    calculate_global_metrics(G)
+    global_metrics = calculate_global_metrics(G)
 
     save_metrics(metrics)
+
+    save_global_metrics(global_metrics)
 
     visualize_top_nodes(metrics)
