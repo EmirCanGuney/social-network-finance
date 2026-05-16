@@ -1,4 +1,4 @@
-node_count,edge_count,density,connected_components,largest_component_size,average_clustering,scenario,removed_node
-18,19,0.12418300653594772,9,6,0.3333333333333333,Original network,-
-17,14,0.10294117647058823,9,5,0.29411764705882354,Remove highest degree node,SP500
-17,14,0.10294117647058823,9,5,0.29411764705882354,Remove highest betweenness node,VIX
+Scenario,Removed node,Nodes,Edges,Density,Connected components,Largest component size,Average clustering
+Original network,-,18,19,0.12418300653594772,9,6,0.3333333333333333
+Remove highest degree node,SP500,17,14,0.10294117647058823,9,5,0.29411764705882354
+Remove highest betweenness node,VIX,17,14,0.10294117647058823,9,5,0.29411764705882354

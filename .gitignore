@@ -8,3 +8,4 @@ env/
 .DS_Store
 Thumbs.db
 report/_extracted/
+report/_*_report_text.txt
