@@ -1,0 +1,4 @@
+Scenario,Removed node,Nodes,Edges,Density,Connected components,Largest component size,Average clustering
+Original network,-,37,94,0.14114114114114115,12,13,0.6666120666120665
+Remove highest degree node,BIST100,36,82,0.13015873015873017,12,12,0.6569304152637486
+Remove highest betweenness node,VIX,36,89,0.14126984126984127,12,13,0.6554994388327722
